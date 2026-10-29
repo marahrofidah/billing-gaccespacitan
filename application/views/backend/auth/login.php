@@ -17,10 +17,73 @@
 
     <!-- Custom styles for this template-->
     <link href="<?= base_url('assets/backend/') ?>css/sb-admin-2.min.css" rel="stylesheet">
+    <style>
+        body.login-page {
+            background-color: #F4F7FC;
+            color: #394059;
+        }
+
+        .login-page .card {
+            background-color: #394059;
+            border-top: 4px solid #46FF23;
+            border-radius: 0.75rem;
+            color: #F4F7FC;
+        }
+
+        .login-page .text-center,
+        .login-page .custom-control-label {
+            color: #F4F7FC;
+        }
+
+        .login-page .form-control {
+            background-color: #F4F7FC;
+            color: #394059;
+        }
+
+        .login-page hr {
+            border-color: rgba(244, 247, 252, 0.25);
+        }
+
+        .login-page .form-control:focus {
+            border-color: #01BFD7;
+            box-shadow: 0 0 0 0.2rem rgba(1, 191, 215, 0.2);
+        }
+
+        .login-page input[type="radio"],
+        .login-page .custom-control-input:checked ~ .custom-control-label::before {
+            accent-color: #46FF23;
+        }
+
+        .login-page .custom-control-input:checked ~ .custom-control-label::before {
+            background-color: #46FF23;
+            border-color: #46FF23;
+        }
+
+        .login-page .btn-primary {
+            background-color: #01BFD7;
+            border-color: #01BFD7;
+            color: #394059;
+        }
+
+        .login-page .btn-primary:hover,
+        .login-page .btn-primary:focus {
+            background-color: #394059;
+            border-color: #394059;
+            color: #F4F7FC;
+        }
+
+        .login-page a {
+            color: #F4F7FC;
+        }
+
+        .login-page a:hover {
+            color: #01BFD7;
+        }
+    </style>
 
 </head>
 
-<body class="bg-gradient-dark">
+<body class="login-page">
 
     <div class="container">
 
