@@ -878,27 +878,43 @@ class Bill extends CI_Controller
     }
     public function generateselected()
     {
-        $noservices = $_POST['noservices'];
+        $noservices = $this->input->post('noservices');
+        $month = $this->input->post('month');
+        $year = $this->input->post('year');
         $company = $this->db->get('company')->row_array();
-        if ($noservices == null) {
+        if (empty($noservices)) {
             $this->session->set_flashdata('error-sweet', 'Tagihan belum dipilih');
             redirect($_SERVER['HTTP_REFERER']);
         } else {
-            $no_services = $this->customer_m->getCustomerSelecteddraf($noservices)->result();
-            // var_dump($no_services);
-            // die;
-            $month = $this->input->post('month');
-            $year =  $this->input->post('year');
+            $selectedCustomers = $this->customer_m->getCustomerSelecteddraf($noservices)->result();
+            $customersToGenerate = [];
+            $noservices = [];
+            foreach ($selectedCustomers as $customer) {
+                $existingInvoice = $this->db->get_where('invoice', [
+                    'no_services' => $customer->no_services,
+                    'month' => $month,
+                    'year' => $year,
+                ])->row_array();
+                if (empty($existingInvoice)) {
+                    $customersToGenerate[] = $customer;
+                    $noservices[] = $customer->no_services;
+                }
+            }
+            if (empty($customersToGenerate)) {
+                $this->session->set_flashdata('error-sweet', 'Tagihan pelanggan yang dipilih sudah tersimpan');
+                redirect($_SERVER['HTTP_REFERER']);
+            }
+
             $getInv = $this->bill_m->getRecentInv()->row();
             $tgl = date('ymd');
             $no = 001;
-        if (!$getInv || $getInv->invoice == 0) {
+            if (!$getInv || $getInv->invoice == 0) {
                 $kode = ($tgl . '' .  str_pad($no, 3, "0", STR_PAD_LEFT));
             } else {
                 $kode = $getInv->invoice + 1;
             }
             $dataNS = [];
-            foreach ($no_services as $c => $row) {
+            foreach ($customersToGenerate as $c => $row) {
 
                 if ($row->ppn != 0) {
                     $ppn = $company['ppn'];
@@ -2383,11 +2399,7 @@ class Bill extends CI_Controller
             $row = array();
             $row[] = ++$no;
 
-            if ($querying > 0) {
-                $row[] = '';
-            } else {
-                $row[] = '<input type=' . 'checkbox' . ' class=' . 'check-item' . ' id="ceklis" name=' . 'noservices[]' . ' value=' . $result->no_services . '>';
-            }
+            $row[] = '<input type=' . 'checkbox' . ' class=' . 'check-item' . ' name=' . 'noservices[]' . ' value=' . $result->no_services . '>';
 
             $row[] = $result->no_services;
             $row[] = $result->name;
@@ -2398,7 +2410,7 @@ class Bill extends CI_Controller
                 $row[] = indo_currency($subtotal);
             }
             // cek tagihan
-            if ($querying > 0) {
+            if (!empty($querying)) {
                 $row[] = indo_date($querying['inv_due_date']);
             } else {
                 if ($result->month_due_date == 0) {
@@ -2408,7 +2420,7 @@ class Bill extends CI_Controller
                 }
                 $row[] = $result->due_date . ' ' . indo_month($month) . ' ' . date('Y');
             }
-            if ($querying > 0) {
+            if (!empty($querying)) {
                 if ($querying['status'] == 'BELUM BAYAR') {
                     $row[] = '<div class="badge badge-danger">' . $querying['status'] . '</div>';
                 } else {
@@ -2418,7 +2430,7 @@ class Bill extends CI_Controller
                 $row[] = 'Tagihan Belum Disimpan';
             }
 
-            if ($querying == 0) {
+            if (empty($querying)) {
                 $row[] = ' <a href="#" id="savebill" data-no_services="' . $result->no_services . '"   data-name="' . $result->name . '"    data-toggle="modal" data-target="#SaveModal" ><i class="fas fa-save" style="font-size:20px; color:blue"></i></a>  
                 <a href="' . site_url('services/detail/' . $result->no_services) . '" title="Detail Paket"     ><i class="fas fa-clone" style="font-size:20px; color:green"></i></a>';
             } else {
@@ -2457,11 +2469,7 @@ class Bill extends CI_Controller
                 $subtotal +=  $dataa->total;
             $row = array();
             $row[] = ++$no;
-   if ($querying > 0) {
-                $row[] = '';
-            } else {
-                $row[] = '<input type=' . 'checkbox' . ' class=' . 'check-item' . ' id="ceklis" name=' . 'noservices[]' . ' value=' . $result->no_services . '>';
-            }
+            $row[] = '<input type=' . 'checkbox' . ' class=' . 'check-item' . ' name=' . 'noservices[]' . ' value=' . $result->no_services . '>';
             $row[] = $result->no_services;
             $row[] = $result->name;
               if ($result->ppn == 1) {
@@ -2471,7 +2479,7 @@ class Bill extends CI_Controller
                 $row[] = indo_currency($subtotal);
             }
             // cek tagihan
-            if ($querying > 0) {
+            if (!empty($querying)) {
                 $row[] = indo_date($querying['inv_due_date']);
             } else {
                 if ($result->month_due_date == 0) {
@@ -2481,7 +2489,7 @@ class Bill extends CI_Controller
                 }
                 $row[] = $result->due_date . ' ' . indo_month($month) . ' ' . date('Y');
             }
-              if ($querying > 0) {
+              if (!empty($querying)) {
                 if ($querying['status'] == 'BELUM BAYAR') {
                     $row[] = '<div class="badge badge-danger">' . $querying['status'] . '</div>';
                 } else {
@@ -2490,7 +2498,7 @@ class Bill extends CI_Controller
             } else {
                 $row[] = 'Tagihan Belum Disimpan';
             }
-               if ($querying == 0) {
+               if (empty($querying)) {
                 $row[] = ' <a href="#" id="savebill" data-no_services="' . $result->no_services . '"   data-name="' . $result->name . '"    data-toggle="modal" data-target="#SaveModal" ><i class="fas fa-save" style="font-size:20px; color:blue"></i></a>  
                 <a href="' . site_url('services/detail/' . $result->no_services) . '" title="Detail Paket"     ><i class="fas fa-clone" style="font-size:20px; color:green"></i></a>';
             } else {
