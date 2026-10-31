@@ -297,6 +297,8 @@ class customer extends CI_Controller
         if ($this->form_validation->run() == false) {
             $data['title'] = 'Add Customer';
             $data['company'] = $this->db->get('company')->row_array();
+            $data['customer'] = (object) ['coverage' => 0];
+            $data['package'] = $this->db->get('package')->row_array();
             if ($this->session->userdata('role_id') == 3 && $role['coverage_operator'] == 1) {
                 $operator = $this->db->get_where('cover_operator', ['operator' => $this->session->userdata('id')])->result();
                 if (count($operator) == 0) {

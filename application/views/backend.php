@@ -413,7 +413,7 @@
                     <div id="collapseCustomer" class="collapse <?= $title == 'Aktif' | $title == 'Isolir' | $title == 'Add Customer' | $title == 'Free' | $title == 'Whatsapp Pelanggan' | $title == 'Non-Aktif' | $title == 'Maps' | $title == 'Customer' | $title == 'Waiting' ? 'show' : '' ?>" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                         <div class="bg-white py-2 collapse-inner rounded">
 
-                            <?php if ($this->session->userdata('role_id') == 1 or $menu['customer_add'] == 1) { ?>
+                            <?php if ($this->session->userdata('role_id') == 1 or $role['add_customer'] == 1) { ?>
                                 <a class="collapse-item <?= $title == 'Add Customer'  ? 'active' : '' ?>" href="<?= site_url('customer/add') ?>">Tambah</a>
                             <?php } ?>
                        
